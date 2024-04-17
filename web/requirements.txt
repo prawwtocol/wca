@@ -1,0 +1,13 @@
+flask
+redis
+pymongo
+dnspython
+requests
+flask_wtf
+flask-login
+gensim
+numpy==1.14.3
+scipy
+pyopenssl
+bs4
+gunicorn

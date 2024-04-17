@@ -1,0 +1,179 @@
+{% extends "template.html" %}
+{% block content %}
+    <main>
+        <div class="container">
+            <div class="left col-lg-7 col-md-7 col-sm-12">
+                <div class="subtitle">
+                    <h2 class="categories-list">
+                        {% for word in words %}{{ word }}<br/>{% endfor %}
+                    </h2>
+                    <button class="btn-green btn-refresh" onClick="reloadAsGet();">
+                        {#                        #}
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="scrollable-area">
+                    {% for v in images %}
+                        <div class="imege__square text-white" style="display: none">
+                            <a data-fancybox="gallery" href="{{ v }}">
+                                <img class="image lazy"
+                                        {% if isfunny %}
+                                     src="{{ url_for('static', filename='rick.jpeg') }}"
+                                        {% else %}
+                                     src="{{ url_for('static', filename='square.png') }}"
+                                        {% endif %}
+                                     data-src="{{ v }}" alt="Image"
+                                     style="display: none"
+                                     onload="this.style.display='initial'; this.parentNode.parentNode.style.display='initial'; console.log('loaded image');"
+                                     onerror="removeElement(this);"
+                                />
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="right col-lg-5 col-md-5 col-sm-12">
+                <div class="subtitle">
+                    <h2 class="category-header">Categories<br/></h2>
+                </div>
+
+                <div class="subtitle">
+
+                    <form method="POST" action="/">
+                        <input type="hidden" name="type" value="add_category"/>
+
+                        <input name="words" value="{{ words }}" type="hidden"/>
+                        <input name="category_id" value="{{ category_id }}" type="hidden"/>
+                        <input name="images" value="{{ images }}" type="hidden"/>
+                        <input name="categories" value="{{ categories }}" type="hidden"/>
+
+                        <label>
+                            <input style="color: black" class="text" name="text" type="text" value=""
+                                   placeholder="Get new categories">
+                        </label>
+                        <input style="background: var(--main-elements-color); border: none" id="submit-add-category"
+                               type="submit" value="Get"/>
+                    </form>
+
+                </div>
+
+
+                <form method="POST" action="/">
+                    <input type="hidden" name="type" value="submit_categories"/>
+
+                    <input name="category_id" value="{{ category_id }}" type="hidden"/>
+
+                    <div class="checkbox-list scrollable-area">
+                        {% for category in categories %}
+                            <label class="checkbox-container">
+                                <details>
+                                    <summary>{{ category[0] }}</summary>
+                                    <p>{{ category[1] }}</p>
+                                </details>
+
+                                <input class="checkbox" name="checkbox" type="checkbox" value="{{ category[0] }}">
+                                <span class="check-mark"></span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                    <input id="mybutton" class="btn-green btn-submit" type="submit">
+                </form>
+
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function reloadAsGet() {
+            let loc = window.location;
+            window.location = loc.protocol + '//' + loc.host + loc.pathname + loc.search;
+        }
+    </script>
+
+    <script>
+        function removeElement(element) {
+            let toDelete = element.parentNode.parentNode;
+            toDelete.parentNode.removeChild(toDelete);
+        }
+    </script>
+
+    <script>
+        const button = document.getElementById("mybutton");
+        const checkboxes = document.getElementsByClassName("checkbox");
+        const main = "#8b9dc3";
+        const title = "#3b5998";
+
+        function onChangeListener() {
+            button.style.backgroundColor = main;
+            for (let i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    button.style.backgroundColor = title;
+                }
+            }
+        }
+
+        for (let i = 0; i < checkboxes.length; i++) {
+            const checkbox = checkboxes[i];
+            checkbox.addEventListener("change", onChangeListener);
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let lazyloadImages;
+
+            if ("IntersectionObserver" in window) {
+                lazyloadImages = document.querySelectorAll(".lazy");
+                const imageObserver = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            const image = entry.target;
+                            image.src = image.dataset.src;
+                            image.classList.remove("lazy");
+                            imageObserver.unobserve(image);
+                        }
+                    });
+                });
+
+                lazyloadImages.forEach(function (image) {
+                    imageObserver.observe(image);
+                });
+            } else {
+                let lazyloadThrottleTimeout;
+                lazyloadImages = document.querySelectorAll(".lazy");
+
+                function lazyload() {
+                    if (lazyloadThrottleTimeout) {
+                        clearTimeout(lazyloadThrottleTimeout);
+                    }
+                    lazyloadThrottleTimeout = setTimeout(function () {
+                        const scrollTop = window.pageYOffset;
+                        lazyloadImages.forEach(function (img) {
+                            if (img.offsetTop < (window.innerHeight + scrollTop)) {
+                                img.src = img.dataset.src;
+                                img.classList.remove('lazy');
+                            }
+                        });
+                        if (lazyloadImages.length === 0) {
+                            document.removeEventListener("scroll", lazyload);
+                            window.removeEventListener("resize", lazyload);
+                            window.removeEventListener("orientationChange", lazyload);
+                        }
+                    }, 20);
+                }
+
+                document.addEventListener("scroll", lazyload);
+                window.addEventListener("resize", lazyload);
+                window.addEventListener("orientationChange", lazyload);
+            }
+        })
+
+    </script>
+    <script src="../static/js/yall.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", yall);
+    </script>
+
+{% endblock %}
