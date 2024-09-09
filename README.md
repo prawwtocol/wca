@@ -1,7 +1,5 @@
 # WCA (Web Categories Annotator)
 
-## ITMO University coding practice project.
-
 ### Quick start guide for deployment:
 1. Get all the `Docker` images [here](https://github.com/1ncend1ary/wca/packages).
 2. Create a directory and place the `docker-compose.yml` file there.
@@ -29,4 +27,3 @@ cd wca
 6. In your browser: `localhost:8080` for web application, `localhost:19981` for database web-interface.
 7. You can follow [this](http://ec2-54-80-63-254.compute-1.amazonaws.com:8080/) link for a deployed application
 
-###### [Working progress guide](./WP.md)
